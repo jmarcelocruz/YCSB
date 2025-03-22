@@ -46,6 +46,7 @@ public class Etcd3ClientTest {
 
   @After
   public void teardown() throws DBException {
+    client.clear();
     client.cleanup();
   }
 

@@ -39,17 +39,7 @@ public class Etcd3Client extends DB {
 
   @Override
   public void cleanup() throws DBException {
-    ByteSequence key = ByteSequence.from(new byte[]{'\0'});
-    DeleteOption opt = DeleteOption.builder()
-        .withRange(ByteSequence.from(new byte[]{'\0'}))
-        .build();
-    try {
-      client.getKVClient().delete(key, opt).get();
-    } catch (InterruptedException | ExecutionException e) {
-      throw new DBException(e);
-    } finally {
-      client.close();
-    }
+    client.close();
   }
 
   @Override
@@ -142,6 +132,20 @@ public class Etcd3Client extends DB {
         .build();
     try {
       kv.delete(k, opt).get();
+    } catch (InterruptedException | ExecutionException e) {
+      return Status.ERROR;
+    }
+
+    return Status.OK;
+  }
+
+  public Status clear() {
+    ByteSequence key = ByteSequence.from(new byte[]{'\0'});
+    DeleteOption opt = DeleteOption.builder()
+        .withRange(ByteSequence.from(new byte[]{'\0'}))
+        .build();
+    try {
+      client.getKVClient().delete(key, opt).get();
     } catch (InterruptedException | ExecutionException e) {
       return Status.ERROR;
     }
